@@ -123,10 +123,13 @@ function NavBar({ scrolled }) {
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-        {["Platform", "Community", "About"].map((item) => (
+        {[
+          { label: "Platform", href: "/" },
+          { label: "About", href: "/about" },
+        ].map((item) => (
           <a
-            key={item}
-            href="#"
+            key={item.label}
+            href={item.href}
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 11,
@@ -139,7 +142,7 @@ function NavBar({ scrolled }) {
             onMouseEnter={(e) => (e.target.style.color = "#C5A572")}
             onMouseLeave={(e) => (e.target.style.color = "rgba(245,240,232,0.55)")}
           >
-            {item}
+            {item.label}
           </a>
         ))}
         <button
