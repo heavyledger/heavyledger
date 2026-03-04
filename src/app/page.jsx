@@ -143,6 +143,7 @@ function NavBar({ scrolled }) {
           </a>
         ))}
         <button
+          onClick={() => document.getElementById("waitlist-cta")?.scrollIntoView({ behavior: "smooth" })}
           style={{
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: 11,
@@ -641,6 +642,25 @@ export default function HeavyLedger() {
   const [feedRef, feedVisible] = useInView();
   const [featuresRef, featuresVisible] = useInView();
   const [ctaRef, ctaVisible] = useInView();
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState("idle");
+
+  const handleWaitlistSubmit = async () => {
+    if (!waitlistEmail || !waitlistEmail.includes("@")) return;
+    setWaitlistStatus("sending");
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbzbXGV3w9L9JZ27qIg5MnG68_KqBSdKJN6FGcGhm5AIoIrxVdHuVHuYYHzcq7ihwmHN9w/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: waitlistEmail }),
+      });
+      setWaitlistStatus("sent");
+      setWaitlistEmail("");
+    } catch (e) {
+      setWaitlistStatus("idle");
+    }
+  };
 
   useEffect(() => {
     setTimeout(() => setHeroVisible(true), 100);
@@ -914,6 +934,7 @@ export default function HeavyLedger() {
 
       {/* CTA */}
       <section
+        id="waitlist-cta"
         ref={ctaRef}
         style={{
           padding: "120px clamp(20px, 8vw, 120px)",
@@ -966,6 +987,8 @@ export default function HeavyLedger() {
             <input
               type="email"
               placeholder="your@email.com"
+              value={waitlistEmail}
+              onChange={(e) => setWaitlistEmail(e.target.value)}
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 13,
@@ -978,22 +1001,29 @@ export default function HeavyLedger() {
               }}
             />
             <button
+              onClick={handleWaitlistSubmit}
+              disabled={waitlistStatus === "sending"}
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 11,
                 letterSpacing: 1.5,
                 textTransform: "uppercase",
-                background: "#C5A572",
+                background: waitlistStatus === "sent" ? "#4CAF50" : "#C5A572",
                 color: "#0C0C0C",
                 border: "none",
                 padding: "14px 28px",
-                cursor: "pointer",
+                cursor: waitlistStatus === "sending" ? "wait" : "pointer",
                 fontWeight: 600,
               }}
             >
-              Join Waitlist
+              {waitlistStatus === "sending" ? "Sending..." : waitlistStatus === "sent" ? "You're In" : "Join Waitlist"}
             </button>
           </div>
+          {waitlistStatus === "sent" && (
+            <p style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: 13, color: "#4CAF50", marginTop: 16 }}>
+              Welcome aboard. We'll be in touch.
+            </p>
+          )}
         </div>
       </section>
 
@@ -1018,10 +1048,15 @@ export default function HeavyLedger() {
           © 2026 HEAVYLEDGER.COM — ALL RIGHTS RESERVED
         </div>
         <div style={{ display: "flex", gap: 24 }}>
-          {["Twitter", "Instagram", "LinkedIn"].map((s) => (
+          {[
+            { label: "X", url: "https://x.com/heavy_ledger" },
+            { label: "Instagram", url: "https://instagram.com/heavy_ledger" },
+          ].map((s) => (
             <a
-              key={s}
-              href="#"
+              key={s.label}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 10,
@@ -1031,7 +1066,7 @@ export default function HeavyLedger() {
                 textTransform: "uppercase",
               }}
             >
-              {s}
+              {s.label}
             </a>
           ))}
         </div>
