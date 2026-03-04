@@ -1051,6 +1051,7 @@ export default function HeavyLedger() {
           {[
             { label: "X", url: "https://x.com/heavy_ledger" },
             { label: "Instagram", url: "https://instagram.com/heavy_ledger" },
+            { label: "Reddit", url: "https://reddit.com/r/heavyledger" },
           ].map((s) => (
             <a
               key={s.label}
